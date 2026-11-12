@@ -1,0 +1,3 @@
+- insert:
+    - id: restart-button
+      name: dsh-restart-button
