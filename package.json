@@ -1,24 +1,57 @@
 {
-	"name": "dsh-restart-button",
-	"version": "0.2.1",
-	"description": "Adds a \"Restart DSH\" item to the sidebar account menu (the one with Settings / Feedback). Restarts dsh-web via Supervisor autorestart.",
-	"keywords": ["dsh", "dsh-plugin", "deepseek-harness", "ui"],
-	"license": "MIT",
-	"type": "module",
-	"main": "./index.js",
-	"exports": {
-		".": "./index.js",
-		"./client": "./client.js",
-		"./cordis.patch.yml": "./cordis.patch.yml"
-	},
-	"files": ["index.js", "guard.js", "client.js", "cordis.patch.yml"],
-	"scripts": { "test": "node --test tests/" },
-	"dsh": {
-		"bundle": { "patch": "./cordis.patch.yml" },
-		"client": {
-			"platform": "web",
-			"inject": ["@deepseek-ai/dsh-client-ui-slots", "@deepseek-ai/dsh-client-locale"],
-			"immediately": true
-		}
-	}
+  "name": "@huakira/restart-button",
+  "version": "0.3.0",
+  "description": "Adds a guarded \"Restart DSH\" item plus \"Update plugins and restart\" to the sidebar account menu; restarts dsh-web through Supervisor autorestart.",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "ui"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml"
+  },
+  "files": [
+    "index.js",
+    "guard.js",
+    "update.js",
+    "client.js",
+    "cordis.patch.yml"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-client-locale"
+      ],
+      "immediately": true
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Huakira/dsh-restart-button.git"
+  },
+  "author": {
+    "name": "Huakira",
+    "email": "huakexie@proton.me"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "dsh": ">=0.2.2-rc.1 <0.3.0",
+    "node": ">=20"
+  }
 }

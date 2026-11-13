@@ -3,8 +3,8 @@ window.__ModuleLoader__.load({
 	factory: () => {
 		const zh = /^zh/i.test(navigator.language || "");
 		const L = zh
-			? { item: "重启 DSH", confirm: "检查并重启 DSH？有任何会话、子代理或后台任务运行时会拒绝重启。", fail: "重启未执行：" }
-			: { item: "Restart DSH", confirm: "Check and restart DSH? Restart is refused while any session, subagent, or background job is running.", fail: "Restart not performed: " };
+			? { item: "重启 DSH", update: "更新插件并重启", confirm: "检查并重启 DSH？有任何会话、子代理或后台任务运行时会拒绝重启。", confirmUpdate: "先更新 registry 安装的插件再重启？更新可能要一两分钟，期间页面会无响应；有任务运行时会拒绝。", fail: "重启未执行：" }
+			: { item: "Restart DSH", update: "Update plugins and restart", confirm: "Check and restart DSH? Restart is refused while any session, subagent, or background job is running.", confirmUpdate: "Update registry-installed plugins, then restart? The update can take a minute or two; it is refused while any task is running.", fail: "Restart not performed: " };
 		const ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 4v5h-5"/></svg>';
 		const MARK = "data-dsh-restart";
 
@@ -15,14 +15,13 @@ window.__ModuleLoader__.load({
 			return Array.isArray(snap?.ids) ? snap.ids : [];
 		}
 
-		async function restart(ctx) {
+		async function restart(ctx, update) {
 			const ids = sessionIds(ctx);
 			const id = ids.find((x) => location.href.includes(x)) ?? ids[0];
 			if (!id) { alert(L.fail + "no session"); return; }
-			if (!window.confirm(L.confirm)) return;
+			if (!window.confirm(update ? L.confirmUpdate : L.confirm)) return;
 			try {
-				await ctx.remote.commands.execute(id, "/dshrestart", []);
-				console.info("[dsh-restart-button]", L.done);
+				await ctx.remote.commands.execute(id, update ? "/dshupdate" : "/dshrestart", []);
 			} catch (e) {
 				alert(L.fail + (e?.message ?? e));
 			}
@@ -52,9 +51,21 @@ window.__ModuleLoader__.load({
 				ev.preventDefault();
 				ev.stopPropagation();
 				document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
-				restart(ctx);
+				restart(ctx, false);
 			});
 			base.parentElement.insertBefore(clone, base.nextSibling);
+			const update = clone.cloneNode(true);
+			update.setAttribute(MARK, "update");
+			const labels = [...update.children];
+			const label = labels.length > 2 ? labels[1] : labels[labels.length - 1];
+			if (label) label.textContent = L.update;
+			update.addEventListener("click", (ev) => {
+				ev.preventDefault();
+				ev.stopPropagation();
+				document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+				restart(ctx, true);
+			});
+			clone.parentElement.insertBefore(update, clone.nextSibling);
 		}
 
 		function apply(ctx) {

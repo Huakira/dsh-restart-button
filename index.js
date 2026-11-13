@@ -1,6 +1,7 @@
 /** Host-wide restart commands. SIGTERM lets Supervisor autorestart DSH. */
 import { execFile } from 'node:child_process';
 import { createRestartController, inspectActivity } from './guard.js';
+import { updateInstalledBundles } from './update.js';
 
 export const name = 'restart-button';
 export const inject = ['commands'];
@@ -34,5 +35,16 @@ export function apply(ctx) {
 		name: 'dshrestart',
 		description: '仅在全部会话、子代理与后台任务空闲时重启 DSH；有任务运行则拒绝',
 		handler: (invocation) => controller.request(invocation),
+	});
+	ctx.commands.register({
+		name: 'dshupdate',
+		description: '先更新 registry 安装的插件，再按空闲检查重启 DSH；有任务运行则拒绝',
+		handler: async (invocation) => {
+			const idle = controller.check();
+			if (idle.kind !== 'success') return idle;
+			const report = await updateInstalledBundles({ manager: ctx.get('pluginManager'), log: (...args) => ctx.logger?.warn?.(...args) });
+			const restart = await controller.request(invocation);
+			return { kind: restart.kind, text: report.text + ' ' + restart.text };
+		},
 	});
 }
