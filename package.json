@@ -1,6 +1,6 @@
 {
 	"name": "dsh-restart-button",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "Adds a \"Restart DSH\" item to the sidebar account menu (the one with Settings / Feedback). Restarts dsh-web via Supervisor autorestart.",
 	"keywords": ["dsh", "dsh-plugin", "deepseek-harness", "ui"],
 	"license": "MIT",
@@ -11,7 +11,8 @@
 		"./client": "./client.js",
 		"./cordis.patch.yml": "./cordis.patch.yml"
 	},
-	"files": ["index.js", "client.js", "cordis.patch.yml"],
+	"files": ["index.js", "guard.js", "client.js", "cordis.patch.yml"],
+	"scripts": { "test": "node --test tests/" },
 	"dsh": {
 		"bundle": { "patch": "./cordis.patch.yml" },
 		"client": {

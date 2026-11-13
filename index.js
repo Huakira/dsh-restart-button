@@ -1,35 +1,38 @@
-/**
- * dsh-restart-button, host half. Registers /dshrestart. The client half adds a
- * menu item that runs it. Restart = SIGTERM to the Supervisor-managed process,
- * so autorestart respawns it (never `supervisorctl restart`, which kills its own
- * client when run from inside dsh).
- */
+/** Host-wide restart commands. SIGTERM lets Supervisor autorestart DSH. */
 import { execFile } from 'node:child_process';
+import { createRestartController, inspectActivity } from './guard.js';
 
 export const name = 'restart-button';
 export const inject = ['commands'];
-
 const PROGRAM = 'dsh-web:dsh-web_00';
 
-function supervisorPid() {
-	return new Promise((resolve) => {
-		execFile('supervisorctl', ['pid', PROGRAM], { timeout: 3000 }, (err, stdout) => {
-			const pid = Number.parseInt(String(stdout ?? '').trim(), 10);
-			resolve(!err && Number.isInteger(pid) && pid > 1 ? pid : process.pid);
+export function supervisorPid() {
+	return new Promise((resolve, reject) => {
+		execFile('supervisorctl', ['pid', PROGRAM], { timeout: 3000 }, (error, stdout) => {
+			const text = String(stdout ?? '').trim();
+			const pid = /^\d+$/.test(text) ? Number(text) : NaN;
+			if (error || !Number.isSafeInteger(pid) || pid <= 1) {
+				reject(new Error('无法确定 Supervisor 管理的 DSH PID，不发送重启信号。'));
+			} else resolve(pid);
 		});
 	});
 }
 
 export function apply(ctx) {
+	const controller = createRestartController({
+		inspect: () => inspectActivity(ctx),
+		resolvePid: supervisorPid,
+		signal: (pid, signal) => process.kill(pid, signal),
+	});
+	ctx.effect(() => () => controller.dispose());
+	ctx.commands.register({
+		name: 'dshrestartcheck',
+		description: '只读检查全部会话、子代理与后台任务是否空闲，不触发重启',
+		handler: () => controller.check(),
+	});
 	ctx.commands.register({
 		name: 'dshrestart',
-		description: '重启 DSH（Supervisor autorestart 约 1 秒内拉起，进行中的会话会中断）',
-		handler: async () => {
-			const pid = await supervisorPid();
-			setTimeout(() => {
-				try { process.kill(pid, 'SIGTERM'); } catch { /* already gone */ }
-			}, 800);
-			return { kind: 'success', text: '正在重启 DSH（pid ' + pid + '），几秒后刷新页面。' };
-		}
+		description: '仅在全部会话、子代理与后台任务空闲时重启 DSH；有任务运行则拒绝',
+		handler: (invocation) => controller.request(invocation),
 	});
 }
