@@ -33,9 +33,7 @@ export function inspectActivity(ctx) {
 			}
 		}
 		if (blockers.length) {
-			const listed = blockers.slice(0, 8).join('\n');
-			const more = blockers.length > 8 ? '\n另有 ' + (blockers.length - 8) + ' 项' : '';
-			return { kind: 'error', text: '拒绝重启：仍有 ' + blockers.length + ' 项正在运行或停止中。请等它们自然结束，不要用 Stop 绕过保护。\n' + listed + more };
+			return { kind: 'error', text: '拒绝重启：仍有 ' + blockers.length + ' 项正在运行或停止中。等它们自然结束后再试，不要用 Stop 绕过。' };
 		}
 		return { kind: 'success', text: '检查通过：全部 ' + agents.length + ' 个已加载会话（含子代理）空闲，未发现运行中的后台任务。' };
 	} catch (error) {
