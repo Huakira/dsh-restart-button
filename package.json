@@ -1,6 +1,6 @@
 {
 	"name": "dsh-restart-button",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"description": "Adds a \"Restart DSH\" item to the sidebar account menu (the one with Settings / Feedback). Restarts dsh-web via Supervisor autorestart.",
 	"keywords": ["dsh", "dsh-plugin", "deepseek-harness", "ui"],
 	"license": "MIT",

@@ -16,7 +16,8 @@ test('inspectActivity reports running sessions as blockers', () => {
 		},
 	});
 	assert.equal(blockers.kind, 'error');
-	assert.match(blockers.text, /root-1/);
+	assert.match(blockers.text, /拒绝重启：仍有 1 项/);
+	assert.doesNotMatch(blockers.text, /root-1/);
 });
 
 test('inspectActivity counts background jobs of every owner', () => {
@@ -32,8 +33,8 @@ test('inspectActivity counts background jobs of every owner', () => {
 	});
 	assert.equal(calls, 3);
 	assert.equal(blockers.kind, 'error');
-	assert.match(blockers.text, /bash-1/);
-	assert.match(blockers.text, /bash-2/);
+	assert.match(blockers.text, /拒绝重启：仍有 2 项/);
+	assert.doesNotMatch(blockers.text, /bash-1|bash-2/);
 });
 
 test('inspectActivity fails closed when registries are unavailable', () => {
