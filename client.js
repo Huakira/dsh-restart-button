@@ -3,8 +3,8 @@ window.__ModuleLoader__.load({
 	factory: () => {
 		const zh = /^zh/i.test(navigator.language || "");
 		const L = zh
-			? { item: "重启 DSH", confirm: "重启 DSH？进行中的会话会中断，几秒后自动恢复。", done: "已发出重启，几秒后页面会重连。", fail: "重启失败：" }
-			: { item: "Restart DSH", confirm: "Restart DSH? Running sessions will be interrupted and resume in a few seconds.", done: "Restart sent. The page will reconnect shortly.", fail: "Restart failed: " };
+			? { item: "重启 DSH", confirm: "检查并重启 DSH？有任何会话、子代理或后台任务运行时会拒绝重启。", fail: "重启未执行：" }
+			: { item: "Restart DSH", confirm: "Check and restart DSH? Restart is refused while any session, subagent, or background job is running.", fail: "Restart not performed: " };
 		const ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 4v5h-5"/></svg>';
 		const MARK = "data-dsh-restart";
 
