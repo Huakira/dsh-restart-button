@@ -1,5 +1,5 @@
 window.__ModuleLoader__.load({
-	id: "dsh-restart-button",
+	id: "@huakirax/dsh-restart-button",
 	factory: () => {
 		const zh = /^zh/i.test(navigator.language || "");
 		const L = zh

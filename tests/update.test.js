@@ -13,8 +13,8 @@ const bundle = (name, overrides = {}) => ({
 });
 
 test('isRegistrySource accepts registry specs only', () => {
-	assert.equal(isRegistrySource('@huakira/session-library'), true);
-	assert.equal(isRegistrySource('dsh-ears'), true);
+	assert.equal(isRegistrySource('@huakirax/dsh-session-library'), true);
+	assert.equal(isRegistrySource('@huakirax/dsh-ears'), true);
 	assert.equal(isRegistrySource('github:Huakira/dsh-session-library'), false);
 	assert.equal(isRegistrySource('git+https://github.com/a/b.git'), false);
 	assert.equal(isRegistrySource('file:../plugin'), false);
@@ -43,7 +43,7 @@ test('updateInstalledBundles updates registry bundles and skips git ones', async
 	const calls = [];
 	const manager = {
 		listBundles: async () => [
-			bundle('@huakira/session-library'),
+			bundle('@huakirax/dsh-session-library'),
 			bundle('github:Huakira/dsh-mac-mount', { source: 'github:Huakira/dsh-mac-mount' }),
 			bundle('@huakira/restart-button', { version: '0.3.0' }),
 			bundle('@huakira/broken'),
@@ -61,15 +61,15 @@ test('updateInstalledBundles updates registry bundles and skips git ones', async
 	};
 	const report = await updateInstalledBundles({ manager });
 	assert.deepEqual(calls, [
-		['list', '@huakira/session-library'],
-		['update', '@huakira/session-library', '1.1.0'],
+		['list', '@huakirax/dsh-session-library'],
+		['update', '@huakirax/dsh-session-library', '1.1.0'],
 		['list', '@huakira/restart-button'],
 		['list', '@huakira/broken'],
 	]);
-	assert.deepEqual(report.updated, [{ name: '@huakira/session-library', from: '1.0.0', to: '1.1.0' }]);
+	assert.deepEqual(report.updated, [{ name: '@huakirax/dsh-session-library', from: '1.0.0', to: '1.1.0' }]);
 	assert.equal(report.failed.length, 0);
 	assert.deepEqual(report.skipped.map(row => row.name), ['@huakira/broken']);
-	assert.match(report.text, /已更新 @huakira\/session-library/);
+	assert.match(report.text, /已更新 @huakirax\/dsh-session-library/);
 	assert.match(report.text, /跳过 @huakira\/broken/);
 });
 
