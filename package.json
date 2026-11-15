@@ -1,6 +1,6 @@
 {
   "name": "@huakirax/dsh-restart-button",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Adds a guarded \"Restart DSH\" item plus \"Update plugins and restart\" to the sidebar account menu; restarts dsh-web through Supervisor autorestart.",
   "keywords": [
     "dsh",
