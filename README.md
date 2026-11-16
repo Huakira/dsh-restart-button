@@ -4,7 +4,7 @@
 
 安装：`dsh plugin --profile web add @huakirax/dsh-restart-button`
 
-Adds three account-menu items — "重启 DSH", "更新插件并重启" and "插件变更延后（开/关）" — plus three host commands. The last item reads and flips `/defer-restart` (needs `@huakirax/dsh-defer-restart`; without it the item says so):
+Adds two account-menu items — "重启 DSH" and "更新插件并重启" — plus three host commands. (The old "插件变更延后" item was removed in 0.4.2, together with `@huakirax/dsh-defer-restart`: switching it on dropped HMR and broke `/api/remote.mux`.)
 
 - `/dshrestartcheck` — read-only check: reports whether every live session (including subagents) and background job is idle.
 - `/dshupdate` — update registry-installed plugins first (`pluginManager.listVersions` → `updateBundle`, failures roll back on their own), then run the same guarded restart. Plugins still installed from git are skipped: they have no registry version to compare.

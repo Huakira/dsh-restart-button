@@ -3,8 +3,8 @@ window.__ModuleLoader__.load({
 	factory: () => {
 		const zh = /^zh/i.test(navigator.language || "");
 		const L = zh
-			? { defer: "插件变更延后（开/关）", deferOn: "当前：已开启。安装、启用、更新插件都等到下次重启才生效。\n\n要关闭并恢复热加载吗？", deferOff: "当前：未开启（插件变更会热加载）。\n\n要开启延后吗？开启后安装、启用、更新插件都等到下次重启才生效。", deferUnknown: "读不到当前状态：/defer-restart 命令不存在。dsh-defer-restart 如果刚安装，需要重启 DSH 后才会加载。", item: "重启 DSH", update: "更新插件并重启", confirm: "检查并重启 DSH？有任何会话、子代理或后台任务运行时会拒绝重启。", confirmUpdate: "先更新 registry 安装的插件再重启？更新可能要一两分钟，期间页面会无响应；有任务运行时会拒绝。", fail: "重启未执行：" }
-			: { defer: "Defer plugin changes (on/off)", deferOn: "Currently on: installs, enables and updates wait for the next restart.\n\nTurn it off and restore hot reload?", deferOff: "Currently off (plugin changes hot-load).\n\nTurn it on? Installs, enables and updates will then wait for the next restart.", deferUnknown: "Cannot read the current state: the /defer-restart command does not exist. If dsh-defer-restart was just installed, restart DSH to load it.", item: "Restart DSH", update: "Update plugins and restart", confirm: "Check and restart DSH? Restart is refused while any session, subagent, or background job is running.", confirmUpdate: "Update registry-installed plugins, then restart? The update can take a minute or two; it is refused while any task is running.", fail: "Restart not performed: " };
+			? { item: "重启 DSH", update: "更新插件并重启", confirm: "检查并重启 DSH？有任何会话、子代理或后台任务运行时会拒绝重启。", confirmUpdate: "先更新 registry 安装的插件再重启？更新可能要一两分钟，期间页面会无响应；有任务运行时会拒绝。", fail: "重启未执行：" }
+			: { item: "Restart DSH", update: "Update plugins and restart", confirm: "Check and restart DSH? Restart is refused while any session, subagent, or background job is running.", confirmUpdate: "Update registry-installed plugins, then restart? The update can take a minute or two; it is refused while any task is running.", fail: "Restart not performed: " };
 		const ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 4v5h-5"/></svg>';
 		const MARK = "data-dsh-restart";
 
@@ -39,20 +39,6 @@ window.__ModuleLoader__.load({
 			return typeof v === "string" ? v : String(v?.text ?? "");
 		}
 
-		async function toggleDefer(ctx) {
-			const id = sessionIdNow(ctx);
-			if (!id) { alert(L.fail + "no session"); return; }
-			try {
-				const status = await runCommand(ctx, id, "/defer-restart status");
-				const m = /defer-restart:\s*(on|off)/.exec(status);
-				if (!m) { alert(L.deferUnknown + status); return; }
-				const isOn = m[1] === "on";
-				if (!window.confirm(isOn ? L.deferOn : L.deferOff)) return;
-				alert(await runCommand(ctx, id, isOn ? "/defer-restart off" : "/defer-restart on"));
-			} catch (e) {
-				alert(L.fail + (e?.message ?? e));
-			}
-		}
 
 		function decorate(menu, ctx) {
 			if (menu.querySelector("[" + MARK + "]")) return;
@@ -93,18 +79,6 @@ window.__ModuleLoader__.load({
 				restart(ctx, true);
 			});
 			clone.parentElement.insertBefore(update, clone.nextSibling);
-			const defer = clone.cloneNode(true);
-			defer.setAttribute(MARK, "defer");
-			const dl = [...defer.children];
-			const dlabel = dl.length > 2 ? dl[1] : dl[dl.length - 1];
-			if (dlabel) dlabel.textContent = L.defer;
-			defer.addEventListener("click", (ev) => {
-				ev.preventDefault();
-				ev.stopPropagation();
-				document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
-				toggleDefer(ctx);
-			});
-			update.parentElement.insertBefore(defer, update.nextSibling);
 		}
 
 		function apply(ctx) {
